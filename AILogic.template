@@ -1,0 +1,140 @@
+template <typename T>
+AILogic<T>::AILogic(){}
+
+template <typename T>
+void AILogic<T>::expand(BTree<T>*& root)
+{
+	Board board = root->getData();
+	if(board.isBoardFull() || board.isWinner())
+	{}
+	else
+	{
+		//create 2 random numbers that 
+		// haven't been used
+		// Initialise number 0 (doesn't matter that it's outisde of boundary point)
+		int position1 = 0;
+		// Get our first random number
+		position1 = randomNumber();
+		// Testing: Output previous moves for board 1
+		std::cout << "Moves that have been played: ";
+		for(int a=0; a<9; a++)
+		{
+			std::cout << root->getData().getPreviousMoves(a) << ", ";
+		}
+		std::cout << std::endl;
+		// If the random number has already been used, generate a new random number
+		// Until we find one that isn't used
+		while(root->getData().findInPreviousMoves(position1) == true)
+			{position1 = randomNumber();}
+		// Generate our second random number
+		int position2 = randomNumber();
+		// While our second random number is a used move or
+		// is equal to position 1, generate a new random number
+		if(root->getData().getMove() < 9)
+		{
+			while ((root->getData().findInPreviousMoves(position2)) || (position2 == position1)) // check with previousMoves
+			{position2 = randomNumber();}
+		}
+		else
+		{
+			while ((root->getData().findInPreviousMoves(position2))) // check with previousMoves
+				{position2 = randomNumber();}
+		}
+		//-----------
+		// Testing shit
+		std::cout << "Position 1: " << position1 << std::endl; 
+		std::cout << "Position 2: " << position2 << std::endl;
+		// ----------
+
+		// Expand boards with new moves
+		// Create a new board with root board as constructor
+
+		// If left is an empty pointer
+		// or the gameboard as left is neither full or finished (a player has won)
+		// if(root->getLeft()->getData().isBoardFull() || (root->getLeft()->getData().isWinner()))
+		// 	std::cout << "My left gameboard is full or has a winner\n";
+		if(root->getLeft() == NULL || ((!(root->getLeft()->getData().isBoardFull()) || !(root->getLeft()->getData().isWinner()))))
+		{
+			std::string strPosition1 = "";
+			std::stringstream sStream1;
+			sStream1 << position1;
+			strPosition1 = sStream1.str();
+			Board* board1 = new Board(root->getData());
+			std::cout << "Adding to board1\n";
+			// Add our first move to that board
+			board1->addMove(strPosition1);
+			// Create a new tree of type board
+			BTree<Board>* boardTree1 = new BTree<Board>;
+			// Put our board in the tree
+			boardTree1->setData(*board1);
+
+			std::cout << "Setting left \n";
+			// Left = boardTree1
+			root->setLeft(boardTree1);
+			std::cout << "Expanding left tree\n";
+			// expand left tree
+			expand(boardTree1);
+		}
+		if (root->getRight() == NULL || ((!(root->getRight()->getData().isBoardFull()) || !(root->getRight()->getData().isWinner()))))
+		{
+			std::string strPosition2 = "";
+			std::stringstream sStream2;
+			sStream2 << position2;
+			strPosition2 = sStream2.str();
+			Board* board2 = new Board(root->getData());
+			std::cout << "Adding to board2\n";
+			board2->addMove(strPosition2);
+			BTree<Board>* boardTree2 = new BTree<Board>;
+			boardTree2->setData(*board2);
+			std::cout << "Setting right \n";
+			root->setRight(boardTree2);
+			std::cout << "Expanding right tree\n";
+			expand(boardTree2);
+		}
+		
+		// set left and right of root as boards (in trees)
+
+	}
+}
+
+template<typename T>
+int AILogic<T>::getComparison(const BTree<T>* root)
+{
+	int left = evaluate(root->getLeft());
+	int right = evaluate(root->getRight());
+	int moves = root->getData().getMove() - 1;
+	if (left > right)
+		return root->getLeft()->getData().getPreviousMoves(moves);
+	else
+		return root->getRight()->getData().getPreviousMoves(moves);;
+}
+
+template <typename T>
+int AILogic<T>::evaluate(const BTree<T>* root)
+{
+	//if leaf
+	if(root->getData().isBoardFull() || root->getData().isWinner())
+	{
+		//return -1, 0, or 1
+		return root->getData().isAIWinner();
+	}
+	else
+	{
+		std::cout << "evaluate shit!\n";
+		return evaluate(root->getLeft()) +  evaluate(root->getRight());
+	}
+}
+
+template <typename T>
+int AILogic<T>::randomNumber()
+{
+	// Generate random seed time
+	srand(time(NULL));
+	// Random and number from up and to 9 (and including)
+	int randNum = rand() % 9+1;
+	// If the randomNum is out of bounds, keep on regenerating
+	// the numbers until meet our criteria
+	if ((randNum > 9) || randNum < 1)
+		randNum = randomNumber();
+	return randNum;
+}

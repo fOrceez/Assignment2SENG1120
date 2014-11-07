@@ -1,0 +1,80 @@
+
+
+//CONSTRUCTOR
+template <typename Item>
+BTree<Item>::BTree(){}
+
+template <typename Item>
+BTree<Item>::BTree(const Item& init_data, BTree<Item>* parent_link, BTree<Item>* leftLink,  BTree<Item>* rightLink)
+{
+	parent = parent_link;
+	left = leftLink;
+	right = rightLink;
+}
+
+//MUTATOR METHODS
+template <typename Item>
+void BTree<Item>::setData(const Item& new_data)
+{
+	data = new_data;
+}
+
+template <typename Item>
+Item BTree<Item>::getData() const
+{
+	return data;
+}
+
+template <typename Item>
+void BTree<Item>::setParent(BTree<Item>* new_parent)
+{
+	parent = new_parent;
+}
+
+template <typename Item>
+const BTree<Item>* BTree<Item>::getParent() const
+{
+	return parent;
+}
+
+template <typename Item>
+BTree<Item>* BTree<Item>::getParent()
+{
+	return parent;
+}
+
+template <typename Item>
+void BTree<Item>::setLeft(BTree<Item>* newLeft)
+{
+	left = newLeft;
+}
+
+template <typename Item>
+const BTree<Item>* BTree<Item>::getLeft() const
+{
+	return left;
+}
+
+template <typename Item>
+BTree<Item>* BTree<Item>::getLeft()
+{
+	return left;
+}
+
+template <typename Item>
+void BTree<Item>::setRight(BTree<Item>* newRight)
+{
+	right = newRight;
+}
+
+template <typename Item>
+const BTree<Item>* BTree<Item>::getRight() const
+{
+	return right;
+}
+
+template <typename Item>
+BTree<Item>* BTree<Item>::getRight()
+{
+	return right;
+}
