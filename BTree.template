@@ -1,4 +1,6 @@
-
+// Programmer: Jeremy Law
+// Course code: SENG1120
+// Student number: c3183613
 
 //CONSTRUCTOR
 template <typename Item>

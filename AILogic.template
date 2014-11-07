@@ -1,3 +1,7 @@
+// Programmer: Jeremy Law
+// Course code: SENG1120
+// Student number: c3183613
+
 template <typename T>
 AILogic<T>::AILogic(){}
 
@@ -15,13 +19,6 @@ void AILogic<T>::expand(BTree<T>*& root)
 		int position1 = 0;
 		// Get our first random number
 		position1 = randomNumber();
-		// Testing: Output previous moves for board 1
-		std::cout << "Moves that have been played: ";
-		for(int a=0; a<9; a++)
-		{
-			std::cout << root->getData().getPreviousMoves(a) << ", ";
-		}
-		std::cout << std::endl;
 		// If the random number has already been used, generate a new random number
 		// Until we find one that isn't used
 		while(root->getData().findInPreviousMoves(position1) == true)
@@ -40,11 +37,6 @@ void AILogic<T>::expand(BTree<T>*& root)
 			while ((root->getData().findInPreviousMoves(position2))) // check with previousMoves
 				{position2 = randomNumber();}
 		}
-		//-----------
-		// Testing shit
-		std::cout << "Position 1: " << position1 << std::endl; 
-		std::cout << "Position 2: " << position2 << std::endl;
-		// ----------
 
 		// Expand boards with new moves
 		// Create a new board with root board as constructor
@@ -60,21 +52,18 @@ void AILogic<T>::expand(BTree<T>*& root)
 			sStream1 << position1;
 			strPosition1 = sStream1.str();
 			Board* board1 = new Board(root->getData());
-			std::cout << "Adding to board1\n";
 			// Add our first move to that board
 			board1->addMove(strPosition1);
 			// Create a new tree of type board
 			BTree<Board>* boardTree1 = new BTree<Board>;
 			// Put our board in the tree
 			boardTree1->setData(*board1);
-
-			std::cout << "Setting left \n";
 			// Left = boardTree1
 			root->setLeft(boardTree1);
-			std::cout << "Expanding left tree\n";
 			// expand left tree
 			expand(boardTree1);
 		}
+		// same thing for the right
 		if (root->getRight() == NULL || ((!(root->getRight()->getData().isBoardFull()) || !(root->getRight()->getData().isWinner()))))
 		{
 			std::string strPosition2 = "";
@@ -82,27 +71,25 @@ void AILogic<T>::expand(BTree<T>*& root)
 			sStream2 << position2;
 			strPosition2 = sStream2.str();
 			Board* board2 = new Board(root->getData());
-			std::cout << "Adding to board2\n";
 			board2->addMove(strPosition2);
 			BTree<Board>* boardTree2 = new BTree<Board>;
 			boardTree2->setData(*board2);
-			std::cout << "Setting right \n";
 			root->setRight(boardTree2);
-			std::cout << "Expanding right tree\n";
 			expand(boardTree2);
 		}
-		
-		// set left and right of root as boards (in trees)
-
 	}
 }
 
 template<typename T>
 int AILogic<T>::getComparison(const BTree<T>* root)
 {
+	// Creates aliases for ease of use
 	int left = evaluate(root->getLeft());
 	int right = evaluate(root->getRight());
+	// Moves is always 1 ahead of what we want (to match the array position)
 	int moves = root->getData().getMove() - 1;
+	// If the score of the left child tree is bigger than the right child tree,
+	// Return the last move that the AI made to get there
 	if (left > right)
 		return root->getLeft()->getData().getPreviousMoves(moves);
 	else
@@ -112,15 +99,17 @@ int AILogic<T>::getComparison(const BTree<T>* root)
 template <typename T>
 int AILogic<T>::evaluate(const BTree<T>* root)
 {
-	//if leaf
+	//if leaf, return depending on the board state
 	if(root->getData().isBoardFull() || root->getData().isWinner())
 	{
-		//return -1, 0, or 1
+		// return 1 if AI wins
+		// return 0 if there is a draw
+		// return -1 if the AI loses
 		return root->getData().isAIWinner();
 	}
+	// Otherwise, keep transversing down the tree, recursively being a swagger child
 	else
 	{
-		std::cout << "evaluate shit!\n";
 		return evaluate(root->getLeft()) +  evaluate(root->getRight());
 	}
 }
